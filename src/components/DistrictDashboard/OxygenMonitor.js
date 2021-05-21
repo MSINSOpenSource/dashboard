@@ -1,11 +1,17 @@
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React, { lazy, Suspense, useMemo } from "react";
+import React, { lazy, Suspense, useMemo, useState } from "react";
 import useSWR from "swr";
 
 import { careSummary } from "../../utils/api";
-import { OXYGEN_TYPES } from "../../utils/constants";
+import {
+  OXYGEN_TYPES,
+  OXYGEN_INVENTORY,
+  OXYGEN_INVENTORY_NAME,
+  OXYGEN_CAPACITY_TRANSLATION,
+  OXYGEN_TYPES_KEYS,
+} from "../../utils/constants";
 import {
   dateString,
   getNDateAfter,
@@ -13,8 +19,8 @@ import {
   processFacilities,
 } from "../../utils/utils";
 import ThemedSuspense from "../ThemedSuspense";
+import GenericTable from "./GenericTable";
 
-const FacilityTable = lazy(() => import("./FacilityTable"));
 dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);
 
@@ -30,7 +36,10 @@ const stockSummary = (oxygenFlatData, key) => {
     valid_entries.length;
 
   return (
-    <div className="md-space-y-0 gap-4 grid-cols-3 my-4 p-4 min-w-0 text-gray-800 dark:text-white dark:bg-gray-800 bg-white rounded-lg shadow-xs overflow-hidden space-y-4 md:grid">
+    <div
+      key={key}
+      className="md-space-y-0 gap-4 grid-cols-3 my-4 p-4 min-w-0 text-gray-800 dark:text-white dark:bg-gray-800 bg-white rounded-lg shadow-xs overflow-hidden space-y-4 md:grid"
+    >
       <div className="flex items-center">
         <div>
           <svg
@@ -104,11 +113,19 @@ const stockSummary = (oxygenFlatData, key) => {
   );
 };
 
-const showStockWithBurnRate = (inventoryItem) => {
+const showStockWithBurnRate = (facility, k, inventoryItem) => {
   return inventoryItem ? (
-    <div className={inventoryItem?.is_low ? "text-red-500" : ""}>
+    <div key={k} className={inventoryItem?.is_low ? "text-red-500" : ""}>
       <div className={"text-md font-bold "}>
-        {inventoryItem?.stock}{" "}
+        {inventoryItem?.stock}
+        {" / "}
+        {OXYGEN_TYPES_KEYS[k] === "liquid"
+          ? (
+              facility[OXYGEN_CAPACITY_TRANSLATION[OXYGEN_TYPES_KEYS[k]]] *
+              0.8778
+            ).toFixed(2)
+          : facility[OXYGEN_CAPACITY_TRANSLATION[OXYGEN_TYPES_KEYS[k]]]}
+
         <span className="pl-1 font-mono text-xs">{inventoryItem?.unit} </span>
       </div>
       <small className="flex items-center mt-2 text-sm">
@@ -134,30 +151,99 @@ const showStockWithBurnRate = (inventoryItem) => {
           {inventoryItem?.unit} / hr{" "}
         </span>
       </small>
-      <small className="flex items-center mt-2">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-4 h-4"
-          fill="currentColor"
-          viewBox="0 0 16 16"
-        >
-          <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584.531.531 0 0 0 .013-.012l.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354a.717.717 0 0 0-.012.012A6.973 6.973 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1h-3zm2 5.6V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5.6a.5.5 0 1 1 1 0z" />
-        </svg>
-        <span className="pl-2 text-sm font-semibold">
-          {(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2)}
+
+      <div className="flex">
+        <span className="relative inline-flex rounded-md shadow-sm">
+          <small className="flex items-center mt-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+            >
+              <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584.531.531 0 0 0 .013-.012l.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354a.717.717 0 0 0-.012.012A6.973 6.973 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1h-3zm2 5.6V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5.6a.5.5 0 1 1 1 0z" />
+            </svg>
+            <span className="pl-2 text-sm font-semibold">
+              {(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2)}
+            </span>
+            <span className="pl-1 font-mono text-xs"> hr </span>
+          </small>
+          {(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2) <
+            5.0 && (
+            <span className="absolute right-0 top-0 flex -mr-5 mt-3 w-4 h-4">
+              <span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping"></span>
+              <span className="relative inline-flex w-4 h-4 bg-red-600 rounded-full"></span>
+            </span>
+          )}
         </span>
-        <span className="pl-1 font-mono text-xs"> hr </span>
-      </small>
+      </div>
+
       <small className="text-xs">
-        {new Date(inventoryItem?.modified_date).toLocaleString()}
+        {dayjs(new Date(inventoryItem?.modified_date)).fromNow()}
       </small>
     </div>
   ) : (
-    "-"
+    <div key={k}></div>
   );
 };
 
+const oxygenSelector = (selector) => {
+  switch (selector.toLowerCase()) {
+    case "last updated":
+      return "inventoryModifiedDate";
+    case "liquid oxygen":
+      return "tte_tank";
+    case "cylinder b":
+      return "tte_b_cylinders";
+    case "cylinder c":
+      return "tte_c_cylinders";
+    case "cylinder d":
+      return "tte_d_cylinders";
+    default:
+      return null;
+  }
+};
+
+const selectorToText = (selector) => {
+  switch (selector) {
+    case "inventoryModifiedDate":
+      return "last updated date";
+    case "tte_tank":
+      return "liquid oxygen time to empty";
+    case "tte_b_cylinders":
+      return "B type cylinder time to empty";
+    case "tte_c_cylinders":
+      return "C type cylinder time to empty";
+    case "tte_d_cylinders":
+      return "D type cylinder time to empty";
+    default:
+      return null;
+  }
+};
+
+const tableHead = (data) => {
+  return data.map((k) => (
+    <div>
+      <div>{k}</div>
+      <div>Stock / Capacity</div>
+    </div>
+  ));
+};
 function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
+  const [orderBy, setOrderBy] = useState({
+    selector: "inventoryModifiedDate",
+    order: 1,
+  });
+  const setOrderByHandler = (selector) => {
+    console.log("Setting OrderBy", selector);
+    const orderBySelector = oxygenSelector(selector);
+    console.log("Setting OrderBy with oxygenSelector", orderBySelector);
+    setOrderBy(
+      orderBySelector
+        ? { selector: orderBySelector, order: -(orderBy?.order || 1) }
+        : undefined
+    );
+  };
   const { data } = useSWR(
     ["OxygenMonitor", date, filterDistrict.id],
     (url, date, district) =>
@@ -169,23 +255,28 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
       )
   );
   const { tableData, oxygenFlatData, exported } = useMemo(() => {
-    const filtered = processFacilities(data.results, filterFacilityTypes);
+    const filtered = processFacilities(
+      data.results,
+      filterFacilityTypes,
+      orderBy
+    );
 
     const tableData = filtered.reduce((a, c) => {
       if (c.date === dateString(date)) {
         if (
           c.inventory &&
           Object.keys(c.inventory).length !== 0 &&
-          (c.inventory[2] || c.inventory[4] || c.inventory[5] || c.inventory[6])
+          Object.keys(c.inventory).some((e) =>
+            Object.values(OXYGEN_INVENTORY).includes(Number(e))
+          )
         ) {
           const arr = [
             [
               [c.name, c.facilityType, c.phoneNumber],
-              [c.oxygenCapacity],
-              showStockWithBurnRate(c.inventory[2]),
-              showStockWithBurnRate(c.inventory[4]),
-              showStockWithBurnRate(c.inventory[6]),
-              showStockWithBurnRate(c.inventory[5]),
+              [dayjs(new Date(c.inventoryModifiedDate)).fromNow()],
+              ...Object.values(OXYGEN_INVENTORY).map((k) =>
+                showStockWithBurnRate(c, k, c.inventory[k])
+              ),
             ],
           ];
 
@@ -202,7 +293,9 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
           c.date === dateString(date) &&
           c.inventory &&
           Object.keys(c.inventory).length !== 0 &&
-          (c.inventory[2] || c.inventory[4] || c.inventory[5] || c.inventory[6])
+          Object.keys(c.inventory).some((e) =>
+            Object.values(OXYGEN_INVENTORY).includes(Number(e))
+          )
         ) {
           return Object.values(c.inventory);
         }
@@ -222,10 +315,9 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
           !(
             c.inventory &&
             Object.keys(c.inventory).length !== 0 &&
-            (c.inventory[2] ||
-              c.inventory[4] ||
-              c.inventory[5] ||
-              c.inventory[6])
+            Object.keys(c.inventory).some((e) =>
+              Object.values(OXYGEN_INVENTORY).includes(Number(e))
+            )
           )
         ) {
           return a;
@@ -250,7 +342,7 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
             "Capacity Type B Cylinders": c.type_b_cylinders,
             "Capacity Type C Cylinders": c.type_c_cylinders,
             "Capacity Type D Cylinders": c.type_d_cylinders,
-            ...[2, 4, 5, 6].reduce((t, x) => {
+            ...Object.values(OXYGEN_INVENTORY).reduce((t, x) => {
               const y = { ...t };
 
               if (c.inventory[x]?.item_name) {
@@ -282,7 +374,7 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
     };
 
     return { tableData, oxygenFlatData, exported };
-  }, [data, filterFacilityTypes]);
+  }, [data, filterFacilityTypes, orderBy]);
 
   return (
     <>
@@ -290,18 +382,32 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
         <h1 className="mt-6 dark:text-white text-3xl font-semibold">
           District Summary
         </h1>
-        {stockSummary(oxygenFlatData, "Liquid Oxygen")}
-        {stockSummary(oxygenFlatData, "Jumbo D Type Oxygen Cylinder")}
-        {stockSummary(oxygenFlatData, "C Type Oxygen Cylinder")}
-        {stockSummary(oxygenFlatData, "B Type Oxygen Cylinder")}
+        {Object.values(OXYGEN_INVENTORY_NAME).map((n) =>
+          stockSummary(oxygenFlatData, n)
+        )}
       </div>
+      {orderBy && (
+        <div className="flex items-center mt-4 space-x-2">
+          <div className="dark:text-white text-xs">
+            Showing Results Filtered by: {selectorToText(orderBy.selector)}{" "}
+            {orderBy.order === 1 ? "ASC" : "DESC"}
+          </div>
+          <div
+            onClick={(_) => setOrderBy(undefined)}
+            className="focus:shadow-outline-green inline-flex items-center justify-center px-2 text-white text-xs leading-5 bg-green-500 active:bg-green-500 hover:bg-green-600 border border-transparent rounded-lg focus:outline-none cursor-pointer transition-colors duration-150"
+          >
+            X Clear Filter
+          </div>
+        </div>
+      )}
 
       <Suspense fallback={<ThemedSuspense />}>
-        <FacilityTable
+        <GenericTable
           className="mb-8"
-          columns={["Name", ...OXYGEN_TYPES]}
+          columns={["Name", "LAST UPDATED", ...Object.values(OXYGEN_TYPES)]}
           data={tableData}
           exported={exported}
+          setOrderBy={setOrderByHandler}
         />
       </Suspense>
     </>

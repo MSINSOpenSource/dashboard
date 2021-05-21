@@ -13,6 +13,7 @@ import {
   AVAILABILITY_TYPES_ORDERED,
   AVAILABILITY_TYPES_PROXY,
   AVAILABILITY_TYPES_TOTAL_ORDERED,
+  GOVT_FACILITY_TYPES,
 } from "../../utils/constants";
 import {
   dateString,
@@ -25,8 +26,8 @@ import { Pill } from "../Pill/Pill";
 import { ValuePill } from "../Pill/ValuePill";
 import ThemedSuspense from "../ThemedSuspense";
 import { SectionTitle } from "../Typography/Title";
+import GenericTable from "./GenericTable";
 
-const FacilityTable = lazy(() => import("./FacilityTable"));
 const CapacityForecast = lazy(() => import("./CapacityForecast"));
 const CapacityMap = lazy(() => import("../DistrictDashboard/CapacityMap"));
 dayjs.extend(relativeTime);
@@ -62,8 +63,9 @@ const showBedsTypes = (ids, c) => {
       </thead>
       <tbody>
         {[...data, { total, current, vacant, critical, title }].map(
-          ({ total, current, vacant, critical, title }) => (
+          ({ total, current, vacant, critical, title }, i) => (
             <tr
+              key={i}
               className={clsx(
                 "py-px text-xs border-b",
                 data === 0 && "opacity-50",
@@ -161,7 +163,9 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
         return [
           ...a,
           {
-            "Govt/Pvt": c.facilityType.startsWith("Govt") ? "Govt" : "Pvt",
+            "Govt/Pvt": GOVT_FACILITY_TYPES.includes(c.facilityType)
+              ? "Govt"
+              : "Pvt",
             "Hops/CFLTC":
               c.facilityType === "First Line Treatment Centre"
                 ? "CFLTC"
@@ -274,7 +278,7 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
           ))}
         </div>
         <Suspense fallback={<ThemedSuspense />}>
-          <FacilityTable
+          <GenericTable
             className="mb-8"
             columns={[
               "Name",

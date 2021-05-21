@@ -1,19 +1,5 @@
-export const DISTRICTS = [
-  { id: 1, name: "Thiruvananthapuram" },
-  { id: 2, name: "Kollam" },
-  { id: 3, name: "Pathanamthitta" },
-  { id: 4, name: "Alappuzha" },
-  { id: 5, name: "Kottayam" },
-  { id: 6, name: "Idukki" },
-  { id: 7, name: "Ernakulam" },
-  { id: 8, name: "Thrissur" },
-  { id: 9, name: "Palakkad" },
-  { id: 10, name: "Malappuram" },
-  { id: 11, name: "Kozhikode" },
-  { id: 12, name: "Wayanad" },
-  { id: 13, name: "Kannur" },
-  { id: 14, name: "Kasaragod" },
-];
+// Activated Districts
+export const ACTIVATED_DISTRICTS = [{ id: 7, name: "Ernakulam" }];
 
 export const AVAILABILITY_TYPES_ORDERED = [
   20,
@@ -126,20 +112,46 @@ export const FACILITY_TYPES = [
   "TeleMedicine",
 ];
 
-export const OXYGEN_TYPES = [
-  "Tank Capacity",
-  "Oxygen Tank",
-  "Cylinder D",
-  "Cylinder C",
-  "Cylinder B",
-];
+// Table title
+export const OXYGEN_TYPES = {
+  liquid: "Liquid Oxygen",
+  type_d: "Cylinder D",
+  type_c: "Cylinder C",
+  type_b: "Cylinder B",
+};
+// ID from care DB
+export const OXYGEN_INVENTORY = {
+  liquid: 2,
+  type_d: 4,
+  type_c: 6,
+  type_b: 5,
+};
+// Reverse Dict for OXYGEN_INVENTORY
+export const OXYGEN_TYPES_KEYS = Object.entries(OXYGEN_INVENTORY).reduce(
+  (acc, [key, value]) => acc && { ...acc, [value]: key },
+  {}
+);
+
+// Name from care DB, used to compute district summary
+export const OXYGEN_INVENTORY_NAME = {
+  liquid: "Liquid Oxygen",
+  type_d: "Jumbo D Type Oxygen Cylinder",
+  type_c: "C Type Oxygen Cylinder",
+  type_b: "B Type Oxygen Cylinder",
+};
+
+export const OXYGEN_CAPACITY_TRANSLATION = {
+  liquid: "oxygenCapacity",
+  type_d: "type_d_cylinders",
+  type_c: "type_c_cylinders",
+  type_b: "type_b_cylinders",
+};
 
 export const CONTENT = {
   CAPACITY: 1,
   PATIENT: 2,
   TESTS: 3,
   TRIAGE: 4,
-  COVID: 5,
   LSG: 6,
   OXYGEN: 7,
   MAP: 8,
