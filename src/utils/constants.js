@@ -1,19 +1,12 @@
 // Activated Districts
-export const ACTIVATED_DISTRICTS = [{ id: 7, name: "Ernakulam" }];
+export const ACTIVATED_DISTRICTS = [
+  { id: 28, name: "Gondia" },
+  { id: 26, name: "Wardha" },
+  { id: 32, name: "Parbhani" },
+];
 
 export const AVAILABILITY_TYPES_ORDERED = [
-  20,
-  10,
-  150,
-  1,
-  100,
-  110,
-  120,
-  30,
-  70,
-  50,
-  60,
-  40,
+  20, 10, 150, 1, 100, 110, 120, 30, 70, 50, 60, 40,
 ];
 
 export const AVAILABILITY_TYPES_TOTAL_ORDERED = [
@@ -28,10 +21,10 @@ export const AVAILABILITY_TYPES = {
   10: "Non-Covid ICU",
   150: "Non-Covid Oxygen Beds",
   1: "Non-Covid Ordinary Bed",
-  70: "KASP Ventilator",
-  50: "KASP ICU",
-  60: "KASP Oxygen Beds",
-  40: "KASP Ordinary Bed",
+  70: "MJPJAY Ventilator",
+  50: "MJPJAY ICU",
+  60: "MJPJAY Oxygen Beds",
+  40: "MJPJAY Ordinary Bed",
   100: "Covid ICU w/ Ventilator",
   110: "Covid ICU",
   120: "Covid Oxygen Beds",
@@ -43,10 +36,10 @@ export const AVAILABILITY_TYPES_PROXY = {
   10: "Non-Covid",
   150: "Non-Covid",
   1: "Non-Covid",
-  70: "KASP",
-  50: "KASP",
-  60: "KASP",
-  40: "KASP",
+  70: "MJPJAY",
+  50: "MJPJAY",
+  60: "MJPJAY",
+  40: "MJPJAY",
   100: "Covid",
   110: "Covid",
   120: "Covid",
@@ -92,8 +85,8 @@ export const GOVT_FACILITY_TYPES = [
   "Family Health Centres",
   "Community Health Centres",
   "Urban Primary Health Center",
-  "Taluk Hospitals",
-  "Taluk Headquarters Hospitals",
+  "Taluka Hospitals",
+  "Taluka Headquarters Hospitals",
   "Women and Child Health Centres",
   "General hospitals",
   "District Hospitals",
@@ -116,15 +109,15 @@ export const FACILITY_TYPES = [
 export const OXYGEN_TYPES = {
   liquid: "Liquid Oxygen",
   type_d: "Cylinder D",
-  type_c: "Cylinder C",
-  type_b: "Cylinder B",
+  type_j: "Cylinder J",
+  gaseous: "Gaseous Oxygen",
 };
 // ID from care DB
 export const OXYGEN_INVENTORY = {
   liquid: 2,
   type_d: 4,
-  type_c: 6,
-  type_b: 5,
+  type_j: 6,
+  gaseous: 5,
 };
 // Reverse Dict for OXYGEN_INVENTORY
 export const OXYGEN_TYPES_KEYS = Object.entries(OXYGEN_INVENTORY).reduce(
@@ -136,15 +129,15 @@ export const OXYGEN_TYPES_KEYS = Object.entries(OXYGEN_INVENTORY).reduce(
 export const OXYGEN_INVENTORY_NAME = {
   liquid: "Liquid Oxygen",
   type_d: "Jumbo D Type Oxygen Cylinder",
-  type_c: "C Type Oxygen Cylinder",
-  type_b: "B Type Oxygen Cylinder",
+  type_j: "J Type Oxygen Cylinder",
+  gaseous: "Gaseous Oxygen",
 };
 
 export const OXYGEN_CAPACITY_TRANSLATION = {
   liquid: "oxygenCapacity",
   type_d: "type_d_cylinders",
-  type_c: "type_c_cylinders",
-  type_b: "type_b_cylinders",
+  type_j: "type_j_cylinders",
+  gaseous: "oxygenCapacityGas",
 };
 
 export const CONTENT = {
@@ -152,7 +145,6 @@ export const CONTENT = {
   PATIENT: 2,
   TESTS: 3,
   TRIAGE: 4,
-  LSG: 6,
   OXYGEN: 7,
   MAP: 8,
 };

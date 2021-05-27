@@ -1,45 +1,45 @@
-import { Card, CardBody, WindmillContext } from "@windmill/react-ui";
-import React, { useContext, useState } from "react";
+import {Card, CardBody, WindmillContext} from "@windmill/react-ui";
+import React, {useContext, useState} from "react";
 import GoogleMapReact from "google-map-react";
 import Geosuggest from "react-geosuggest";
 import Marker from "../Marker/index";
 
 import {
-  AVAILABILITY_TYPES,
-  AVAILABILITY_TYPES_ORDERED,
+    AVAILABILITY_TYPES,
+    AVAILABILITY_TYPES_ORDERED,
 } from "../../utils/constants";
 
 const selectedButtonClasses = (bool) => {
-  const d = " px-4 py-2 font-bold rounded-lg shadow ";
-  return (
-    d +
-    (bool
-      ? "bg-green-500 text-white"
-      : "dark:hover:bg-green-500 hover:text-white hover:bg-green-500 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white")
-  );
+    const d = " px-4 py-2 font-bold rounded-lg shadow ";
+    return (
+        d +
+        (bool
+            ? "bg-green-500 text-white"
+            : "dark:hover:bg-green-500 hover:text-white hover:bg-green-500 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white")
+    );
 };
 
-function GMap({ district, facilities, className }) {
-  const [selectedBedType, setSelectedBedType] = useState("All");
-  const { mode } = useContext(WindmillContext);
+function GMap({district, facilities, className}) {
+    const [selectedBedType, setSelectedBedType] = useState("All");
+    const {mode} = useContext(WindmillContext);
 
-  let [state, setState] = useState({
-    assets: [],
-    showAddressSuggestion: false,
-    center: {
-      lat: 10.1485476,
-      lng: 76.5007524,
-    },
-    zoom: 10,
-  });
+    let [state, setState] = useState({
+        assets: [],
+        showAddressSuggestion: false,
+        center: {
+            lat: 10.1485476,
+            lng: 76.5007524,
+        },
+        zoom: 10,
+    });
 
-  return (
-    <Card className={`${className} overflow-visible relative`}>
-      <CardBody>
-        <div className="main-content-container pb-4 px-4">
-          <div>
-            <div>
-              {/* <Geosuggest
+    return (
+        <Card className={`${className} overflow-visible relative`}>
+            <CardBody>
+                <div className="main-content-container pb-4 px-4">
+                    <div>
+                        <div>
+                            {/* <Geosuggest
                 // ref={el => (this._geoSuggest = el)}
                 placeholder="Search by address"
                 highlightMatch={true}
@@ -100,83 +100,84 @@ function GMap({ district, facilities, className }) {
                   }
                 }}
               /> */}
-            </div>
-          </div>
-          <div>
-            <div>
-              <div>
-                <div style={{ height: "75vh", width: "100%" }}>
-                  <GoogleMapReact
-                    bootstrapURLKeys={{
-                      key: "AIzaSyDsBAc3y7deI5ZO3NtK5GuzKwtUzQNJNUk",
-                    }}
-                    defaultCenter={{
-                      lat: 10.1485476,
-                      lng: 76.5007524,
-                    }}
-                    defaultZoom={8}
-                    center={state.center}
-                    zoom={state.zoom}
-                  >
-                    {facilities
-                      .filter((f) => f.location)
-                      .map((f) => (
-                        <Marker
-                          key={f.id}
-                          data={f}
-                          lat={f.location["latitude"]}
-                          lng={f.location["longitude"]}
-                          coordinates={Object.values(f.location).reverse()}
-                          group={0}
-                          zoom={state.zoom}
-                          selectedBedType={selectedBedType}
-                          setFocus={(center, zoom) => {
-                            setState({ ...state, center, zoom: zoom });
-                          }}
-                        />
-                      ))}
-                  </GoogleMapReact>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            <div>
+                                <div style={{height: "75vh", width: "100%"}}>
+                                    <GoogleMapReact
+                                        bootstrapURLKeys={{
+                                            key: "AIzaSyDoMWVu-NTjRptuhY_LAq7LKwpGPgZuofk",
+                                        }}
+                                        defaultCenter={{
+                                            lat: 10.1485476,
+                                            lng: 76.5007524,
+                                        }}
+                                        defaultZoom={8}
+                                        center={state.center}
+                                        zoom={state.zoom}
+                                    >
+                                        {facilities
+                                            .filter((f) => f.location)
+                                            .map((f) => (
+                                                <Marker
+                                                    key={f.id}
+                                                    data={f}
+                                                    lat={f.location["latitude"]}
+                                                    lng={f.location["longitude"]}
+                                                    coordinates={Object.values(f.location).reverse()}
+                                                    group={0}
+                                                    zoom={state.zoom}
+                                                    selectedBedType={selectedBedType}
+                                                    setFocus={(center, zoom) => {
+                                                        setState({...state, center, zoom: zoom});
+                                                    }}
+                                                />
+                                            ))}
+                                    </GoogleMapReact>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="flex flex-col items-end dark:text-gray-400 text-gray-600 break-all text-xxxs sm:text-xs">
+                <div
+                    className="flex flex-col items-end dark:text-gray-400 text-gray-600 break-all text-xxxs sm:text-xs">
           <span className="inline-flex space-x-1">
             <span>Legends: </span>
-            {[
-              { label: "Available", color: "#00FF00" },
-              { label: "Full", color: "#FF0000" },
-            ].map((x) => (
-              <span key={x.label} style={{ color: x.color }}>
+              {[
+                  {label: "Available", color: "#00FF00"},
+                  {label: "Full", color: "#FF0000"},
+              ].map((x) => (
+                  <span key={x.label} style={{color: x.color}}>
                 {x.label}
               </span>
-            ))}
+              ))}
           </span>
-          <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
-            <button
-              onClick={(_) => setSelectedBedType("All")}
-              className={selectedButtonClasses(selectedBedType === "All")}
-            >
-              Show All
-            </button>
-            {AVAILABILITY_TYPES_ORDERED.filter(
-              (n) => ![40, 50, 60, 70].includes(n)
-            ).map((a) => (
-              <button
-                key={a}
-                onClick={(_) => setSelectedBedType(a)}
-                className={selectedButtonClasses(a === selectedBedType)}
-              >
-                {AVAILABILITY_TYPES[a]}
-              </button>
-            ))}
-          </div>
-        </div>
-      </CardBody>
-    </Card>
-  );
+                    <div className="grid gap-2 grid-cols-2 md:grid-cols-6">
+                        <button
+                            onClick={(_) => setSelectedBedType("All")}
+                            className={selectedButtonClasses(selectedBedType === "All")}
+                        >
+                            Show All
+                        </button>
+                        {AVAILABILITY_TYPES_ORDERED.filter(
+                            (n) => ![40, 50, 60, 70].includes(n)
+                        ).map((a) => (
+                            <button
+                                key={a}
+                                onClick={(_) => setSelectedBedType(a)}
+                                className={selectedButtonClasses(a === selectedBedType)}
+                            >
+                                {AVAILABILITY_TYPES[a]}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </CardBody>
+        </Card>
+    );
 }
 
 export default GMap;

@@ -88,14 +88,14 @@ export const processFacilities = (data, filterFacilityTypes, orderBy) => {
                 data.inventory && data.inventory[OXYGEN_INVENTORY.type_d]
               ) || -1
             ),
-            tte_c_cylinders: Number(
+            tte_j_cylinders: Number(
               timeToEmpty(
-                data.inventory && data.inventory[OXYGEN_INVENTORY.type_c]
+                data.inventory && data.inventory[OXYGEN_INVENTORY.type_j]
               ) || -1
             ),
-            tte_b_cylinders: Number(
+            tte_gaseous: Number(
               timeToEmpty(
-                data.inventory && data.inventory[OXYGEN_INVENTORY.type_b]
+                data.inventory && data.inventory[OXYGEN_INVENTORY.gaseous]
               ) || -1
             ),
           }
