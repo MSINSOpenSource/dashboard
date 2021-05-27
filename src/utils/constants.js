@@ -1,19 +1,12 @@
 // Activated Districts
-export const ACTIVATED_DISTRICTS = [{ id: 28, name: "Gondia" }, {id: 26, name: "Wardha"}, {id: 32, name: "Parbhani"}];
+export const ACTIVATED_DISTRICTS = [
+  { id: 28, name: "Gondia" },
+  { id: 26, name: "Wardha" },
+  { id: 32, name: "Parbhani" },
+];
 
 export const AVAILABILITY_TYPES_ORDERED = [
-  20,
-  10,
-  150,
-  1,
-  100,
-  110,
-  120,
-  30,
-  70,
-  50,
-  60,
-  40,
+  20, 10, 150, 1, 100, 110, 120, 30, 70, 50, 60, 40,
 ];
 
 export const AVAILABILITY_TYPES_TOTAL_ORDERED = [

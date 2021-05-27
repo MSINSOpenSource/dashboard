@@ -32,12 +32,10 @@ function Filter({
   setFilterFacilityTypes,
   content,
 }) {
-  const [facilityTypesFilterOptions, setFacilityTypesFilterOptions] = useState(
-    FACILITY_TYPES
-  );
-  const [_filterFacilityTypes, _setFilterFacilityTypes] = useState(
-    filterFacilityTypes
-  );
+  const [facilityTypesFilterOptions, setFacilityTypesFilterOptions] =
+    useState(FACILITY_TYPES);
+  const [_filterFacilityTypes, _setFilterFacilityTypes] =
+    useState(filterFacilityTypes);
   const [facilityTypeFilterOpen, setFacilityTypeFilterOpen] = useState(false);
   const resetFacilityTypeFilter = () => {
     setFacilityTypeFilterOpen(false);

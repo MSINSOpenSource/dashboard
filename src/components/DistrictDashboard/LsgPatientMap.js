@@ -70,9 +70,10 @@ function LsgPatientMap({ district, className, patients, dateString }) {
     handleZoomOut,
   } = useKeralaMap(district);
 
-  const max = useMemo(() => Math.max(...patients.map((p) => p.total)), [
-    patients,
-  ]);
+  const max = useMemo(
+    () => Math.max(...patients.map((p) => p.total)),
+    [patients]
+  );
 
   return (
     <Card
