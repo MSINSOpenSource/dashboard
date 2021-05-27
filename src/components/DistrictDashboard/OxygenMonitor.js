@@ -28,17 +28,21 @@ const stockSummary = (oxygenFlatData, key) => {
   const entries = oxygenFlatData.filter((f) => f.item_name === key);
   const stock = entries.map((p) => p.stock).reduce((a, b) => a + b, 0);
   const valid_entries = entries.filter(
-    (a) => a?.burn_rate !== 0 && a?.burn_rate !== null
+    (a) => (a?.burn_rate || 0) !== 0 && (a?.burn_rate || null) !== null
   );
-
-  const burn_rate =
-    valid_entries.map((p) => p.burn_rate).reduce((a, b) => a + b, 0) /
-    valid_entries.length;
+  const depleted_entries = valid_entries.filter((a) => a.stock === 0);
+  const valid_nonzero_entries = valid_entries.filter((a) => a.stock !== 0);
+  const burn_rate = valid_nonzero_entries
+    .map((p) => p.burn_rate)
+    .reduce((acc, iter) => acc + iter, 0);
+  const facilities_with_less_than_5_hrs_of_oxygen = valid_nonzero_entries
+    .map((p) => p.stock / p.burn_rate)
+    .filter((f) => f < 5.0);
 
   return (
     <div
       key={key}
-      className="md-space-y-0 gap-4 grid-cols-3 my-4 p-4 min-w-0 text-gray-800 dark:text-white dark:bg-gray-800 bg-white rounded-lg shadow-xs overflow-hidden space-y-4 md:grid"
+      className="md-space-y-0 gap-4 grid-cols-4 my-4 p-4 min-w-0 text-gray-800 dark:text-white dark:bg-gray-800 bg-white rounded-lg shadow-xs overflow-hidden space-y-4 md:grid"
     >
       <div className="flex items-center">
         <div>
@@ -60,7 +64,7 @@ const stockSummary = (oxygenFlatData, key) => {
         </div>
         <div className="">
           <div>{key}</div>
-          <div className="text-3xl font-bold">{stock}</div>
+          <div className="text-3xl font-bold">{stock.toFixed(2)}</div>
           <div className="mt-1 text-sm">{entries[0]?.unit}</div>
         </div>
       </div>
@@ -107,6 +111,32 @@ const stockSummary = (oxygenFlatData, key) => {
             {(stock / burn_rate).toFixed(2)}
           </div>
           <div className="mt-1 text-sm">hours</div>
+        </div>
+      </div>
+      <div className="flex items-center">
+        <div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+            data-prefix="fas"
+            data-icon="exclamation-triangle"
+            className="pr-4 w-12 h-12 text-orange-500"
+            role="img"
+            viewBox="0 0 576 512"
+          >
+            <path
+              fill="currentColor"
+              d="M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z"
+            />
+          </svg>
+        </div>
+        <div>
+          <div>High Alerts</div>
+          <div className="text-3xl font-bold">
+            {facilities_with_less_than_5_hrs_of_oxygen.length}
+          </div>
+          <div className="mt-1 text-sm">Facilities</div>
         </div>
       </div>
     </div>
@@ -235,9 +265,7 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
     order: 1,
   });
   const setOrderByHandler = (selector) => {
-    console.log("Setting OrderBy", selector);
     const orderBySelector = oxygenSelector(selector);
-    console.log("Setting OrderBy with oxygenSelector", orderBySelector);
     setOrderBy(
       orderBySelector
         ? { selector: orderBySelector, order: -(orderBy?.order || 1) }

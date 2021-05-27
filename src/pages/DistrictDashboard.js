@@ -47,9 +47,8 @@ function DistrictDashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const [timeseries, setTimeseries] = useState(false);
   const [filterDistrict, setFilterDistrict] = useState(ACTIVATED_DISTRICTS[0]);
-  const [filterFacilityTypes, setFilterFacilityTypes] = useState(
-    FACILITY_TYPES
-  );
+  const [filterFacilityTypes, setFilterFacilityTypes] =
+    useState(FACILITY_TYPES);
   const [content, setContent] = useState(
     CONTENT[params.content?.toUpperCase()] || CONTENT.CAPACITY
   );
