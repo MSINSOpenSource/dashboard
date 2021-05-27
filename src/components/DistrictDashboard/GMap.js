@@ -5,8 +5,9 @@ import Geosuggest from "react-geosuggest";
 import Marker from "../Marker/index";
 
 import {
-    AVAILABILITY_TYPES,
-    AVAILABILITY_TYPES_ORDERED,
+  AVAILABILITY_TYPES,
+  AVAILABILITY_TYPES_ORDERED,
+  GMAP_KEY,
 } from "../../utils/constants";
 
 const selectedButtonClasses = (bool) => {
@@ -23,15 +24,15 @@ function GMap({district, facilities, className}) {
     const [selectedBedType, setSelectedBedType] = useState("All");
     const {mode} = useContext(WindmillContext);
 
-    let [state, setState] = useState({
-        assets: [],
-        showAddressSuggestion: false,
-        center: {
-            lat: 10.1485476,
-            lng: 76.5007524,
-        },
-        zoom: 10,
-    });
+  let [state, setState] = useState({
+    assets: [],
+    showAddressSuggestion: false,
+    center: {
+      lat: district.lat,
+      lng: district.lng,
+    },
+    zoom: district.zoom,
+  });
 
     return (
         <Card className={`${className} overflow-visible relative`}>
@@ -100,47 +101,47 @@ function GMap({district, facilities, className}) {
                   }
                 }}
               /> */}
-                        </div>
-                    </div>
-                    <div>
-                        <div>
-                            <div>
-                                <div style={{height: "75vh", width: "100%"}}>
-                                    <GoogleMapReact
-                                        bootstrapURLKeys={{
-                                            key: "AIzaSyDoMWVu-NTjRptuhY_LAq7LKwpGPgZuofk",
-                                        }}
-                                        defaultCenter={{
-                                            lat: 10.1485476,
-                                            lng: 76.5007524,
-                                        }}
-                                        defaultZoom={8}
-                                        center={state.center}
-                                        zoom={state.zoom}
-                                    >
-                                        {facilities
-                                            .filter((f) => f.location)
-                                            .map((f) => (
-                                                <Marker
-                                                    key={f.id}
-                                                    data={f}
-                                                    lat={f.location["latitude"]}
-                                                    lng={f.location["longitude"]}
-                                                    coordinates={Object.values(f.location).reverse()}
-                                                    group={0}
-                                                    zoom={state.zoom}
-                                                    selectedBedType={selectedBedType}
-                                                    setFocus={(center, zoom) => {
-                                                        setState({...state, center, zoom: zoom});
-                                                    }}
-                                                />
-                                            ))}
-                                    </GoogleMapReact>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            </div>
+          </div>
+          <div>
+            <div>
+              <div>
+                <div style={{ height: "75vh", width: "100%" }}>
+                  <GoogleMapReact
+                    bootstrapURLKeys={{
+                      key: GMAP_KEY,
+                    }}
+                    defaultCenter={{
+                      lat: 10.1485476,
+                      lng: 76.5007524,
+                    }}
+                    defaultZoom={8}
+                    center={state.center}
+                    zoom={state.zoom}
+                  >
+                    {facilities
+                      .filter((f) => f.location)
+                      .map((f) => (
+                        <Marker
+                          key={f.id}
+                          data={f}
+                          lat={f.location["latitude"]}
+                          lng={f.location["longitude"]}
+                          coordinates={Object.values(f.location).reverse()}
+                          group={0}
+                          zoom={state.zoom}
+                          selectedBedType={selectedBedType}
+                          setFocus={(center, zoom) => {
+                            setState({ ...state, center, zoom: zoom });
+                          }}
+                        />
+                      ))}
+                  </GoogleMapReact>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
                 <div
                     className="flex flex-col items-end dark:text-gray-400 text-gray-600 break-all text-xxxs sm:text-xs">
