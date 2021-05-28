@@ -1,10 +1,9 @@
 // Activated Districts
 export const ACTIVATED_DISTRICTS = [
-  { id: 28, name: "Gondia" },
-  { id: 26, name: "Wardha" },
-  { id: 32, name: "Parbhani" },
+  { id: 28, name: "Gondia", lat: 21.469_268_4, lng: 80.181_719_7, zoom: 13 },
+  { id: 26, name: "Wardha", lat: 20.748_965_9, lng: 78.577_666_3, zoom: 13 },
+  { id: 32, name: "Parbhani", lat: 19.259_643_8, lng: 76.764_307, zoom: 13 },
 ];
-
 export const GMAP_KEY = "AIzaSyBZTzyJJhkMOeTgoE9z3QWUQ7Wl59Vz-Zc";
 
 export const AVAILABILITY_TYPES_ORDERED = [
