@@ -7,18 +7,7 @@ export const ACTIVATED_DISTRICTS = [
 export const GMAP_KEY = "AIzaSyBZTzyJJhkMOeTgoE9z3QWUQ7Wl59Vz-Zc";
 
 export const AVAILABILITY_TYPES_ORDERED = [
-  20,
-  10,
-  150,
-  1,
-  100,
-  110,
-  120,
-  30,
-  70,
-  50,
-  60,
-  40,
+  20, 10, 150, 1, 100, 110, 120, 30, 70, 50, 60, 40,
 ];
 
 export const AVAILABILITY_TYPES_TOTAL_ORDERED = [
