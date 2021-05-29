@@ -45,6 +45,7 @@ function GMap({ district, facilities, className }) {
     });
   }, [district]);
 
+
   return (
     <Card className={`${className} overflow-visible relative`}>
       <CardBody>
