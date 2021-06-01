@@ -281,10 +281,10 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
               "Last Updated",
               "Oxygen",
               "Patients/\nDischarged",
-              "Ventilators",
-              "ICU",
-              "Oxygen Beds",
               "Ordinary Beds",
+              "Oxygen Beds",
+              "ICU",
+              "Ventilators",
             ]}
             data={tableData}
             exported={exported}
