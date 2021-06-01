@@ -144,65 +144,65 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
             a[key][k.id].total += total_covid + total_non_covid;
           });
 
-          return a;
-        },
-        {
-          current: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
-          previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
-        }
-      );
-      const exported = {
-        data: filtered.reduce((a, c) => {
-          if (c.date !== dateString(date)) {
-            return a;
-          }
-          return [
-            ...a,
-            {
-              "Govt/Pvt": GOVT_FACILITY_TYPES.includes(c.facilityType)
-                ? "Govt"
-                : "Pvt",
-              "Hops/CFLTC":
-                c.facilityType === "First Line Treatment Centre"
-                  ? "CFLTC"
-                  : "Hops",
-              "Hospital/CFLTC Address": c.address,
-              "Hospital/CFLTC Name": c.name,
-              Mobile: c.phoneNumber,
-              ...AVAILABILITY_TYPES_ORDERED.reduce((t, x) => {
-                const y = { ...t };
-                y[`Current ${AVAILABILITY_TYPES[x]}`] =
-                  c.capacity[x]?.current_capacity || 0;
-                y[`Total ${AVAILABILITY_TYPES[x]}`] =
-                  c.capacity[x]?.total_capacity || 0;
-                return y;
-              }, {}),
-            },
-          ];
-        }, []),
-        filename: "capacity_export.csv",
-      };
-      const tableData = filtered.reduce((a, c) => {
+        return a;
+      },
+      {
+        current: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
+        previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
+      }
+    );
+    const exported = {
+      data: filtered.reduce((a, c) => {
         if (c.date !== dateString(date)) {
           return a;
         }
         return [
           ...a,
-          [
-            [c.name, c.facilityType, c.phoneNumber],
-            dayjs(c.modifiedDate).fromNow(),
-            c.oxygenCapacity,
-            `${c.actualLivePatients}/${c.actualDischargedPatients}`,
-            showBedsTypes([20, 100], c),
-            showBedsTypes([10, 110], c),
-            showBedsTypes([150, 120], c),
-            showBedsTypes([1, 30], c),
-          ],
+          {
+            "Govt/Pvt": GOVT_FACILITY_TYPES.includes(c.facilityType)
+              ? "Govt"
+              : "Pvt",
+            "Hops/CFLTC":
+              c.facilityType === "First Line Treatment Centre"
+                ? "CFLTC"
+                : "Hops",
+            "Hospital/CFLTC Address": c.address,
+            "Hospital/CFLTC Name": c.name,
+            Mobile: c.phoneNumber,
+            ...AVAILABILITY_TYPES_ORDERED.reduce((t, x) => {
+              const y = { ...t };
+              y[`Current ${AVAILABILITY_TYPES[x]}`] =
+                c.capacity[x]?.current_capacity || 0;
+              y[`Total ${AVAILABILITY_TYPES[x]}`] =
+                c.capacity[x]?.total_capacity || 0;
+              return y;
+            }, {}),
+          },
         ];
-      }, []);
-      const todayFiltered = filtered.filter((f) => f.date === dateString(date));
-      return { facilitiesTrivia, exported, tableData, todayFiltered };
-    }, [data, filterFacilityTypes]);
+      }, []),
+      filename: "capacity_export.csv",
+    };
+    const tableData = filtered.reduce((a, c) => {
+      if (c.date !== dateString(date)) {
+        return a;
+      }
+      return [
+        ...a,
+        [
+          [c.name, c.facilityType, c.phoneNumber],
+          dayjs(c.modifiedDate).fromNow(),
+          c.oxygenCapacity,
+          `${c.actualLivePatients}/${c.actualDischargedPatients}`,
+          showBedsTypes([1, 30], c),
+          showBedsTypes([150, 120], c),
+          showBedsTypes([10, 110], c),
+          showBedsTypes([20, 100], c),
+        ],
+      ];
+    }, []);
+    const todayFiltered = filtered.filter((f) => f.date === dateString(date));
+    return { facilitiesTrivia, exported, tableData, todayFiltered };
+  }, [data, filterFacilityTypes]);
 
   const transitions = useTransition(forecast, null, {
     enter: { opacity: 1 },
@@ -281,10 +281,10 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
               "Last Updated",
               "Oxygen",
               "Patients/\nDischarged",
-              "Ventilators",
-              "ICU",
-              "Oxygen Beds",
               "Ordinary Beds",
+              "Oxygen Beds",
+              "ICU",
+              "Ventilators",
             ]}
             data={tableData}
             exported={exported}
