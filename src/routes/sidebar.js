@@ -25,16 +25,12 @@ const routes = [
     ],
   },
   {
-    href: "https://care.coronasafe.network/",
-    name: "Care",
+    href: "https://care.mahakavach.in/",
+    name: "Mahakavach login",
   },
   {
-    href: "https://kerala.coronasafe.network/",
-    name: "Kerala Dashboard",
-  },
-  {
-    href: "https://kerala.coronasafe.network/hotspots",
-    name: "Kerala Dashboard: Hotspots",
+    href: "https://www.covid19maharashtragov.in/mh-covid/dashboard",
+    name: "Mahrashtra State COVID -19 Dashboard",
   },
 ];
 
