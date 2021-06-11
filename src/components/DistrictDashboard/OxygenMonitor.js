@@ -211,14 +211,14 @@ const showStockWithBurnRate = (facility, k, inventoryItem) => {
             </span>
             <span className="pl-1 font-mono text-xs"> hr </span>
           </small>
-          {( inventoryItem?.burn_rate !== 0 
-          &&(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2) <
-            5.0) && (
-            <span className="absolute right-0 top-0 flex -mr-5 mt-3 w-4 h-4">
-              <span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping"></span>
-              <span className="relative inline-flex w-4 h-4 bg-red-600 rounded-full"></span>
-            </span>
-          )}
+          {inventoryItem?.burn_rate !== 0 &&
+            (inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2) <
+              5.0 && (
+              <span className="absolute right-0 top-0 flex -mr-5 mt-3 w-4 h-4">
+                <span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping"></span>
+                <span className="relative inline-flex w-4 h-4 bg-red-600 rounded-full"></span>
+              </span>
+            )}
         </span>
       </div>
 
@@ -380,10 +380,14 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
             "Expected Type B Cylinders": c.expected_type_b_cylinders,
             "Expected Type C Cylinders": c.expected_type_c_cylinders,
             "Expected Type D Cylinders": c.expected_type_d_cylinders,
+            "Expected Type J Cylinders": c.expected_type_j_cylinders,
+            "Expected Type Gaseous": c.expected_type_gaseous,
             "Capacity Liquid Oxygen": c.oxygenCapacity,
             "Capacity Type B Cylinders": c.type_b_cylinders,
             "Capacity Type C Cylinders": c.type_c_cylinders,
             "Capacity Type D Cylinders": c.type_d_cylinders,
+            "Capacity Type J Cylinders": c.type_j_cylinders,
+            "Capacity Type Gaseous": c.type_gaseous,
             ...Object.values(OXYGEN_INVENTORY).reduce((t, x) => {
               const y = { ...t };
 
@@ -424,9 +428,9 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
         <h1 className="mt-6 dark:text-white text-3xl font-semibold">
           District Summary
         </h1>
-        {Object.values(OXYGEN_INVENTORY_NAME).map((n) =>
-          stockSummary(oxygenFlatData, n)
-        )}
+        {Object.values(OXYGEN_INVENTORY_NAME).map((n) => {
+          return stockSummary(oxygenFlatData, n);
+        })}
       </div>
       {orderBy && (
         <div className="flex items-center mt-4 space-x-2">
