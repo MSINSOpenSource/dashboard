@@ -109,10 +109,16 @@ const stockSummary = (oxygenFlatData, key) => {
         </div>
         <div>
           <div>Time to Empty</div>
-          <div className="text-3xl font-bold">
-            {(stock / burn_rate).toFixed(2)}
-          </div>
-          <div className="mt-1 text-sm">hours</div>
+          {burn_rate > 0 ? (
+            <>
+              <div className="text-3xl font-bold">
+                {(stock / burn_rate).toFixed(2)}
+              </div>
+              <div className="mt-1 text-sm">hours</div>
+            </>
+          ) : (
+            <div className="text-gray-600 text-2xl">N/A</div>
+          )}
         </div>
       </div>
       <div className="flex items-center">
@@ -177,7 +183,9 @@ const showStockWithBurnRate = (facility, k, inventoryItem) => {
           />
         </svg>
         <span className="pl-2 font-semibold">
-          {inventoryItem?.burn_rate?.toFixed(2)}
+          {inventoryItem?.burn_rate > 0
+            ? inventoryItem?.burn_rate?.toFixed(2)
+            : "-"}
         </span>
         <span className="pl-1 font-mono text-xs">
           {inventoryItem?.unit} / hr{" "}
@@ -195,18 +203,22 @@ const showStockWithBurnRate = (facility, k, inventoryItem) => {
             >
               <path d="M6.5 0a.5.5 0 0 0 0 1H7v1.07A7.001 7.001 0 0 0 8 16a7 7 0 0 0 5.29-11.584.531.531 0 0 0 .013-.012l.354-.354.353.354a.5.5 0 1 0 .707-.707l-1.414-1.415a.5.5 0 1 0-.707.707l.354.354-.354.354a.717.717 0 0 0-.012.012A6.973 6.973 0 0 0 9 2.071V1h.5a.5.5 0 0 0 0-1h-3zm2 5.6V9a.5.5 0 0 1-.5.5H4.5a.5.5 0 0 1 0-1h3V5.6a.5.5 0 1 1 1 0z" />
             </svg>
+
             <span className="pl-2 text-sm font-semibold">
-              {(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2)}
+              {inventoryItem?.burn_rate > 0
+                ? (inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2)
+                : "-"}
             </span>
             <span className="pl-1 font-mono text-xs"> hr </span>
           </small>
-          {(inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2) <
-            5.0 && (
-            <span className="absolute right-0 top-0 flex -mr-5 mt-3 w-4 h-4">
-              <span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping"></span>
-              <span className="relative inline-flex w-4 h-4 bg-red-600 rounded-full"></span>
-            </span>
-          )}
+          {inventoryItem?.burn_rate !== 0 &&
+            (inventoryItem?.stock / inventoryItem?.burn_rate).toFixed(2) <
+              5.0 && (
+              <span className="absolute right-0 top-0 flex -mr-5 mt-3 w-4 h-4">
+                <span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping"></span>
+                <span className="relative inline-flex w-4 h-4 bg-red-600 rounded-full"></span>
+              </span>
+            )}
         </span>
       </div>
 
@@ -368,10 +380,14 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
             "Expected Type B Cylinders": c.expected_type_b_cylinders,
             "Expected Type C Cylinders": c.expected_type_c_cylinders,
             "Expected Type D Cylinders": c.expected_type_d_cylinders,
+            "Expected Type J Cylinders": c.expected_type_j_cylinders,
+            "Expected Type Gaseous": c.expected_type_gaseous,
             "Capacity Liquid Oxygen": c.oxygenCapacity,
             "Capacity Type B Cylinders": c.type_b_cylinders,
             "Capacity Type C Cylinders": c.type_c_cylinders,
             "Capacity Type D Cylinders": c.type_d_cylinders,
+            "Capacity Type J Cylinders": c.type_j_cylinders,
+            "Capacity Type Gaseous": c.type_gaseous,
             ...Object.values(OXYGEN_INVENTORY).reduce((t, x) => {
               const y = { ...t };
 
@@ -412,9 +428,9 @@ function OxygenMonitor({ filterDistrict, filterFacilityTypes, date }) {
         <h1 className="mt-6 dark:text-white text-3xl font-semibold">
           District Summary
         </h1>
-        {Object.values(OXYGEN_INVENTORY_NAME).map((n) =>
-          stockSummary(oxygenFlatData, n)
-        )}
+        {Object.values(OXYGEN_INVENTORY_NAME).map((n) => {
+          return stockSummary(oxygenFlatData, n);
+        })}
       </div>
       {orderBy && (
         <div className="flex items-center mt-4 space-x-2">
