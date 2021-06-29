@@ -24,6 +24,8 @@ const initialFacilitiesTrivia = {
   count: 0,
   icu: { total: 0, today: 0 },
   oxygen_bed: { total: 0, today: 0 },
+  bed_with_oxygen_support: { total: 0, today: 0 },
+  icu_with_oxygen_support: { total: 0, today: 0 },
   not_admitted: { total: 0, today: 0 },
   home_isolation: { total: 0, today: 0 },
   isolation_room: { total: 0, today: 0 },
@@ -63,6 +65,7 @@ function Patient({ filterDistrict, filterFacilityTypes, date }) {
         previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
       }
     );
+
     const tableData = filtered.reduce((a, c) => {
       if (c.date !== dateString(date)) {
         return a;
@@ -70,7 +73,7 @@ function Patient({ filterDistrict, filterFacilityTypes, date }) {
       return [
         ...a,
         [
-          [c.name, c.facilityType, c.phoneNumber],
+          [c.name, c.facilityType, c.phoneNumber, c.id],
           dayjs(c.modifiedDate, "DD-MM-YYYY HH:mm").fromNow(),
           ...Object.keys(PATIENT_TYPES).map((k) => {
             const delta = c[`today_patients_${k}`] || 0;
