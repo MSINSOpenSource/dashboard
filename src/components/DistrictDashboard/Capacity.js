@@ -1,8 +1,11 @@
-import { Button } from "@windmill/react-ui";
+import { Button, Input } from "@windmill/react-ui";
+import Pagination from "../Pagination";
 import clsx from "clsx";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React, { lazy, Suspense, useState, useMemo } from "react";
+import fuzzysort from "fuzzysort";
+import React, { lazy, Suspense, useEffect, useState, useMemo } from "react";
+import { CSVLink } from "react-csv";
 import { ArrowRight } from "react-feather";
 import { animated, useTransition } from "react-spring";
 import useSWR from "swr";
@@ -21,12 +24,12 @@ import {
   getNDateBefore,
   processFacilities,
 } from "../../utils/utils";
+import { CapacityCard } from "../Cards/CapacityCard";
 import RadialCard from "../Chart/RadialCard";
 import { Pill } from "../Pill/Pill";
 import { ValuePill } from "../Pill/ValuePill";
 import ThemedSuspense from "../ThemedSuspense";
 import { SectionTitle } from "../Typography/Title";
-import GenericTable from "./GenericTable";
 
 const CapacityForecast = lazy(() => import("./CapacityForecast"));
 const GMap = lazy(() => import("../DistrictDashboard/GMap"));
@@ -34,54 +37,28 @@ dayjs.extend(relativeTime);
 
 const positiveVal = (value) => (value < 0 ? 0 : value);
 
-const showBedsTypes = (ids, c) => {
-  const data = ids.reduce((acc, i) => {
-    const total = Number.parseInt(c.capacity[i]?.total_capacity || 0);
-    const current = Number.parseInt(c.capacity[i]?.current_capacity || 0);
+const getCapacityBedData = (ids, facility) => {
+  return ids.map((i) => {
+    const total = Number.parseInt(facility.capacity[i]?.total_capacity || 0);
+    const current = Number.parseInt(
+      facility.capacity[i]?.current_capacity || 0
+    );
     const vacant = total - current;
-    const critical = total > 0 && vacant / total < 0.2;
-    return [
-      ...acc,
-      { title: AVAILABILITY_TYPES_PROXY[i], total, current, vacant },
-    ];
-  }, []);
-  const total = positiveVal(data[0].total + data[1].total);
-  const current = positiveVal(data[0].current + data[1].current);
-  const vacant = positiveVal(data[0].vacant + data[1].vacant);
-  const title = "Total";
-  const critical = total > 0 && vacant / total < 0.2;
-  if (data[0].total === 0 && data[1].total === 0) return React.null;
-  return (
-    <table className="table-auto w-full">
-      <thead>
-        <tr className="py-px text-xxs border-b space-x-4">
-          <th />
-          <th>Total</th>
-          <th>Used</th>
-          <th>Vacant</th>
-        </tr>
-      </thead>
-      <tbody>
-        {[...data, { total, current, vacant, critical, title }].map(
-          ({ total, current, vacant, critical, title }, i) => (
-            <tr
-              key={i}
-              className={clsx(
-                "py-px text-xs border-b",
-                data === 0 && "opacity-50",
-                critical && "text-red-600"
-              )}
-            >
-              <td className="text-xxs">{title}</td>
-              <td>{total}</td>
-              <td>{current}</td>
-              <td>{vacant}</td>
-            </tr>
-          )
-        )}
-      </tbody>
-    </table>
-  );
+    return {
+      used: current,
+      total,
+      vacant,
+    };
+  });
+};
+
+const getFinalTotalData = (covid, nonCovid) => {
+  return covid.map((val, idx) => {
+    const used = val.used + nonCovid[idx].used;
+    const total = val.total + nonCovid[idx].total;
+    const vacant = val.vacant + nonCovid[idx].vacant;
+    return { used, total, vacant };
+  });
 };
 
 const initialFacilitiesTrivia = {
@@ -119,96 +96,148 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
         district
       )
   );
-  const { facilitiesTrivia, exported, tableData, todayFiltered } =
-    useMemo(() => {
-      const filtered = processFacilities(data.results, filterFacilityTypes);
-      const facilitiesTrivia = filtered.reduce(
-        (a, c) => {
-          const key = c.date === dateString(date) ? "current" : "previous";
-          a[key].count += 1;
-          a[key].oxygen += c.oxygenCapacity || 0;
-          a[key].actualLivePatients += c.actualLivePatients || 0;
-          a[key].actualDischargedPatients += c.actualDischargedPatients || 0;
-          Object.keys(AVAILABILITY_TYPES).forEach((k) => {
-            a[key][k].used += c.capacity[k]?.current_capacity || 0;
-            a[key][k].total += c.capacity[k]?.total_capacity || 0;
-          });
+  const {
+    facilitiesTrivia,
+    exported,
+    todayFiltered,
+    capacityCardData,
+  } = useMemo(() => {
+    const filtered = processFacilities(data.results, filterFacilityTypes);
+    const facilitiesTrivia = filtered.reduce(
+      (a, c) => {
+        const key = c.date === dateString(date) ? "current" : "previous";
+        a[key].count += 1;
+        a[key].oxygen += c.oxygenCapacity || 0;
+        a[key].actualLivePatients += c.actualLivePatients || 0;
+        a[key].actualDischargedPatients += c.actualDischargedPatients || 0;
+        Object.keys(AVAILABILITY_TYPES).forEach((k) => {
+          a[key][k].used += c.capacity[k]?.current_capacity || 0;
+          a[key][k].total += c.capacity[k]?.total_capacity || 0;
+        });
 
-          AVAILABILITY_TYPES_TOTAL_ORDERED.forEach((k) => {
-            let current_covid = c.capacity[k.covid]?.current_capacity || 0;
-            let current_non_covid =
-              c.capacity[k.non_covid]?.current_capacity || 0;
-            let total_covid = c.capacity[k.covid]?.total_capacity || 0;
-            let total_non_covid = c.capacity[k.non_covid]?.total_capacity || 0;
-            a[key][k.id].used += current_covid + current_non_covid;
-            a[key][k.id].total += total_covid + total_non_covid;
-          });
+        AVAILABILITY_TYPES_TOTAL_ORDERED.forEach((k) => {
+          const current_covid = c.capacity[k.covid]?.current_capacity || 0;
+          const current_non_covid =
+            c.capacity[k.non_covid]?.current_capacity || 0;
+          const total_covid = c.capacity[k.covid]?.total_capacity || 0;
+          const total_non_covid = c.capacity[k.non_covid]?.total_capacity || 0;
+          a[key][k.id].used += current_covid + current_non_covid;
+          a[key][k.id].total += total_covid + total_non_covid;
+        });
 
-          return a;
-        },
-        {
-          current: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
-          previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
-        }
-      );
-      const exported = {
-        data: filtered.reduce((a, c) => {
-          if (c.date !== dateString(date)) {
-            return a;
-          }
-          return [
-            ...a,
-            {
-              "Govt/Pvt": GOVT_FACILITY_TYPES.includes(c.facilityType)
-                ? "Govt"
-                : "Pvt",
-              "Hops/CFLTC":
-                c.facilityType === "First Line Treatment Centre"
-                  ? "CFLTC"
-                  : "Hops",
-              "Hospital/CFLTC Address": c.address,
-              "Hospital/CFLTC Name": c.name,
-              Mobile: c.phoneNumber,
-              ...AVAILABILITY_TYPES_ORDERED.reduce((t, x) => {
-                const y = { ...t };
-                y[`Current ${AVAILABILITY_TYPES[x]}`] =
-                  c.capacity[x]?.current_capacity || 0;
-                y[`Total ${AVAILABILITY_TYPES[x]}`] =
-                  c.capacity[x]?.total_capacity || 0;
-                return y;
-              }, {}),
-            },
-          ];
-        }, []),
-        filename: "capacity_export.csv",
-      };
-      const tableData = filtered.reduce((a, c) => {
+        return a;
+      },
+      {
+        current: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
+        previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
+      }
+    );
+    const exported = {
+      data: filtered.reduce((a, c) => {
         if (c.date !== dateString(date)) {
           return a;
         }
         return [
           ...a,
-          [
-            [c.name, c.facilityType, c.phoneNumber],
-            dayjs(c.modifiedDate).fromNow(),
-            c.oxygenCapacity,
-            `${c.actualLivePatients}/${c.actualDischargedPatients}`,
-            showBedsTypes([20, 100], c),
-            showBedsTypes([10, 110], c),
-            showBedsTypes([150, 120], c),
-            showBedsTypes([1, 30], c),
-          ],
+          {
+            "Govt/Pvt": GOVT_FACILITY_TYPES.includes(c.facilityType)
+              ? "Govt"
+              : "Pvt",
+            "Hops/CFLTC":
+              c.facilityType === "First Line Treatment Centre"
+                ? "CFLTC"
+                : "Hops",
+            "Hospital/CFLTC Address": c.address,
+            "Hospital/CFLTC Name": c.name,
+            Mobile: c.phoneNumber,
+            ...AVAILABILITY_TYPES_ORDERED.reduce((t, x) => {
+              const y = { ...t };
+              y[`Current ${AVAILABILITY_TYPES[x]}`] =
+                c.capacity[x]?.current_capacity || 0;
+              y[`Total ${AVAILABILITY_TYPES[x]}`] =
+                c.capacity[x]?.total_capacity || 0;
+              return y;
+            }, {}),
+          },
         ];
-      }, []);
-      const todayFiltered = filtered.filter((f) => f.date === dateString(date));
-      return { facilitiesTrivia, exported, tableData, todayFiltered };
-    }, [data, filterFacilityTypes]);
+      }, []),
+      filename: "capacity_export.csv",
+    };
+
+    const capacityCardData = filtered.reduce((acc, facility) => {
+      const covidData = getCapacityBedData([30, 120, 110, 100], facility);
+      const nonCovidData = getCapacityBedData([1, 150, 10, 20], facility);
+      const finalTotalData = getFinalTotalData(covidData, nonCovidData);
+      const noCapacity = finalTotalData.every((item) => item.total === 0);
+      if (facility.date !== dateString(date) || noCapacity) {
+        return acc;
+      }
+      return [
+        ...acc,
+        {
+          facility_name: facility.name,
+          facility_id: facility.id,
+          facility_type: facility.facilityType,
+          phone_number: facility.phoneNumber,
+          last_updated: dayjs(facility.modifiedDate).fromNow(),
+          patient_discharged: `${facility.actualLivePatients || 0}/${
+            facility.actualDischargedPatients || 0
+          }`,
+          covid: covidData,
+          non_covid: nonCovidData,
+          final_total: finalTotalData,
+        },
+      ];
+    }, []);
+
+    const todayFiltered = filtered.filter((f) => f.date === dateString(date));
+    return {
+      facilitiesTrivia,
+      exported,
+      todayFiltered,
+      capacityCardData,
+    };
+  }, [data, filterFacilityTypes]);
 
   const transitions = useTransition(forecast, null, {
     enter: { opacity: 1 },
     from: { opacity: 0 },
     leave: { opacity: 0 },
   });
+
+  const [filteredData, setFilteredData] = useState(capacityCardData);
+  const [tableData, setTableData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [page, setPage] = useState(0);
+  const resultsPerPage = 10;
+
+  useEffect(() => {
+    const debounce_timer = setTimeout(() => {
+      setFilteredData(
+        searchTerm
+          ? capacityCardData.filter((v) =>
+              fuzzysort
+                .go(
+                  searchTerm,
+                  capacityCardData.map((d) => ({ ...d, 0: d.facility_name })),
+                  { key: "0" }
+                )
+                .map((v) => v.target)
+                .includes(v.facility_name)
+            )
+          : capacityCardData
+      );
+      setPage(0);
+    }, 1000);
+    return () => clearTimeout(debounce_timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    setTableData(
+      filteredData.slice(page * resultsPerPage, (page + 1) * resultsPerPage)
+    );
+  }, [filteredData, page]);
 
   return transitions.map(({ item, key, props }) =>
     item ? (
@@ -273,23 +302,37 @@ function Capacity({ filterDistrict, filterFacilityTypes, date }) {
             />
           ))}
         </div>
-        <Suspense fallback={<ThemedSuspense />}>
-          <GenericTable
-            className="mb-8"
-            columns={[
-              "Name",
-              "Last Updated",
-              "Oxygen",
-              "Patients/\nDischarged",
-              "Ordinary Beds",
-              "Oxygen Beds",
-              "ICU",
-              "Ventilators",
-            ]}
-            data={tableData}
-            exported={exported}
+
+        <div id="facility-capacity-cards" className="mb-16 mt-16">
+          <div className="flex flex-col items-center justify-between md:flex-row">
+            <SectionTitle>Facilities</SectionTitle>
+            <div className="flex max-w-full space-x-4">
+              {exported && (
+                <CSVLink data={exported.data} filename={exported.filename}>
+                  <Button block>Export</Button>
+                </CSVLink>
+              )}
+              <Input
+                className="sw-40 rounded-lg sm:w-auto"
+                placeholder="Search Facility"
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+            </div>
+          </div>
+
+          {tableData.map((data, index) => (
+            <CapacityCard data={data} key={index} />
+          ))}
+
+          <Pagination
+            resultsPerPage={resultsPerPage}
+            totalResults={filteredData.length}
+            currentPage={page}
+            currentResults={tableData.length}
+            handlePageClick={setPage}
           />
-        </Suspense>
+        </div>
         <div id="capacity-map">
           <SectionTitle>Map</SectionTitle>
         </div>
