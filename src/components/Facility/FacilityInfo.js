@@ -51,7 +51,7 @@ const FacilityInfo = ({ facilityData }) => {
       </div>
     </div>
   ) : (
-    <div className="word-wrap my-4 px-2 py-4 text-center text-gray-600 break-words text-2xl font-bold bg-gray-50 dark:bg-gray-800 rounded-md md:text-3xl">
+    <div className="word-wrap bg-gray-50 my-4 px-2 py-4 text-center text-gray-600 break-words text-2xl font-bold dark:bg-gray-800 rounded-md md:text-3xl">
       <p>No Data Available</p>
     </div>
   );

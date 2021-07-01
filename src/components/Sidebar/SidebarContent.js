@@ -1,7 +1,7 @@
 import React from "react";
 import { NavLink, Route } from "react-router-dom";
 
-import { ReactComponent as CoronaSafeLogo } from "../../assets/icons/coronaSafeLogo.svg";
+import msinsLogo from "../../assets/mahakavach/msinsLogo-removebg.png";
 import routes from "../../routes/sidebar";
 import SidebarSubmenu from "./SidebarSubmenu";
 
@@ -44,16 +44,7 @@ function SidebarContent() {
       <ul className="px-6 space-y-1">
         <ul className="flex text-sm space-x-2">
           <li>
-            <a href="https://github.com/coronasafe/dashboard">Github</a>
-          </li>
-          <li>
-            <a href="https://github.com/coronasafe/dashboard/issues">Issues</a>
-          </li>
-          <li>
-            <a href="https://coronasafe.network/volunteer">Volunteer</a>
-          </li>
-          <li>
-            <a href="mailto:info@coronasafe.network">Contact</a>
+            <a href="https://github.com/MSINSOpenSource/dashboard">Github</a>
           </li>
         </ul>
         <li className="flex flex-col">
@@ -62,7 +53,7 @@ function SidebarContent() {
             className="inline-flex text-xs space-x-1"
           >
             <span>Copyright © 2021</span>
-            <CoronaSafeLogo className="h-4" aria-hidden="true" />
+            <img src={msinsLogo} className="m-auto max-h-6" alt="MSINS"></img>
           </a>
           <a
             href="https://github.com/coronasafe/dashboard/blob/master/LICENSE"

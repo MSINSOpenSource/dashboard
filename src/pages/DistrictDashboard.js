@@ -80,8 +80,8 @@ function DistrictDashboard() {
   useEffect(() => {
     window.history.replaceState(
       null,
-      "Care Dashboard",
-      `/district/${filterDistrict.name.toLowerCase()}/${Object.entries(CONTENT)
+      "Maharashtra - Mahakavach Dashboard",
+      `/district/${Object.entries(CONTENT)
         .find((a) => a[1] === content)[0]
         .toLowerCase()}`
     );

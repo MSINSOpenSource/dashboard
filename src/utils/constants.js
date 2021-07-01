@@ -7,18 +7,7 @@ export const ACTIVATED_DISTRICTS = [
 export const GMAP_KEY = "AIzaSyBZTzyJJhkMOeTgoE9z3QWUQ7Wl59Vz-Zc";
 
 export const AVAILABILITY_TYPES_ORDERED = [
-  20,
-  10,
-  150,
-  1,
-  100,
-  110,
-  120,
-  30,
-  70,
-  50,
-  60,
-  40,
+  20, 10, 150, 1, 100, 110, 120, 30, 70, 50, 60, 40,
 ];
 
 export const ORDINARY = [4444, 30, 1, 4];
@@ -124,16 +113,20 @@ export const FACILITY_TYPES = [
 // Table title
 export const OXYGEN_TYPES = {
   liquid: "Liquid Oxygen",
+  type_b: "Cylinder B",
+  type_c: "Cylinder C",
   type_d: "Cylinder D",
   type_j: "Cylinder J",
   gaseous: "Gaseous Oxygen",
 };
 // ID from care DB
 export const OXYGEN_INVENTORY = {
-  liquid: 2,
-  type_d: 4,
-  type_j: 6,
-  gaseous: 5,
+  liquid: 7,
+  type_b: 13,
+  type_c: 14,
+  type_d: 10,
+  type_j: 9,
+  type_gaseous: 8,
 };
 // Reverse Dict for OXYGEN_INVENTORY
 export const OXYGEN_TYPES_KEYS = Object.entries(OXYGEN_INVENTORY).reduce(
@@ -144,16 +137,20 @@ export const OXYGEN_TYPES_KEYS = Object.entries(OXYGEN_INVENTORY).reduce(
 // Name from care DB, used to compute district summary
 export const OXYGEN_INVENTORY_NAME = {
   liquid: "Liquid Oxygen",
-  type_d: "Jumbo D Type Oxygen Cylinder",
-  type_j: "J Type Oxygen Cylinder",
-  gaseous: "Gaseous Oxygen",
+  type_b: "Oxygen Cylinder - B type",
+  type_c: "Oxygen Cylinder - C type",
+  type_d: "Oxygen Cylinder - D type",
+  type_j: "Oxygen Cylinder - J type",
+  type_gaseous: "Gaseous Oxygen",
 };
 
 export const OXYGEN_CAPACITY_TRANSLATION = {
   liquid: "oxygenCapacity",
+  type_b: "type_b_cylinders",
+  type_c: "type_c_cylinders",
   type_d: "type_d_cylinders",
   type_j: "type_j_cylinders",
-  gaseous: "oxygenCapacityGas",
+  type_gaseous: "oxygenCapacityGas",
 };
 
 export const CONTENT = {
