@@ -117,7 +117,7 @@ function Filter({
                 {facilityTypesFilterOptions.map((d, i) => (
                   <Label key={i} check>
                     <Input
-                      onClick={() => {
+                      onChange={() => {
                         const _t = _filterFacilityTypes.indexOf(d);
                         const _tmp = [..._filterFacilityTypes];
                         if (_t > -1) {
@@ -128,7 +128,7 @@ function Filter({
                         _setFilterFacilityTypes(_tmp);
                       }}
                       type="checkbox"
-                      defaultChecked={_filterFacilityTypes.includes(d)}
+                      checked={_filterFacilityTypes.includes(d)}
                     />
                     <span className="ml-2">{d}</span>
                   </Label>
