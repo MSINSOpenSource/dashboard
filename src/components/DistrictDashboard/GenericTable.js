@@ -1,7 +1,6 @@
 import {
   Button,
   Input,
-  Pagination,
   Table as WTable,
   TableBody,
   TableCell,
@@ -10,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@windmill/react-ui";
+import Pagination from "../Pagination";
 import fuzzysort from "fuzzysort";
 import React, { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
@@ -24,7 +24,7 @@ function GenericTable({
 }) {
   const resultsPerPage = 25;
   const [filteredData, setFilteredData] = useState(data);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [tableData, setTableData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -35,19 +35,23 @@ function GenericTable({
             fuzzysort
               .go(
                 searchTerm,
-                data.map((d) => ({ ...d, 0: d[0][0] })),
+                data.map((d) => {
+                  const val = d[0][0].props ? d[0][0].props.children : d[0][0];
+                  return { ...d, 0: val };
+                }),
                 { key: "0" }
               )
               .map((v) => v.target)
-              .includes(v[0][0])
+              .includes(v[0][0].props ? v[0][0].props.children : v[0][0])
           )
         : data
     );
-  }, [data, searchTerm]);
+    setPage(0);
+  }, [searchTerm]);
 
   useEffect(() => {
     setTableData(
-      filteredData.slice((page - 1) * resultsPerPage, page * resultsPerPage)
+      filteredData.slice(page * resultsPerPage, (page + 1) * resultsPerPage)
     );
   }, [filteredData, page]);
 
@@ -96,9 +100,17 @@ function GenericTable({
                       <TableCell key={j}>
                         {j === 0 ? (
                           <div className="flex flex-col w-32 whitespace-pre-wrap">
-                            <p className="text-xs font-semibold xl:text-sm">
-                              {col[0]}
-                            </p>
+                            {col[3] ? (
+                              <a href={`/facility/${col[3]}`}>
+                                <p className="text-xs font-semibold xl:text-sm">
+                                  {col[0]}
+                                </p>
+                              </a>
+                            ) : (
+                              <p className="text-xs font-semibold xl:text-sm">
+                                {col[0]}
+                              </p>
+                            )}
                             <p className="dark:text-gray-400 text-gray-600 text-xxs xl:text-xs">
                               {col[1]}
                             </p>
@@ -118,10 +130,11 @@ function GenericTable({
         </div>
         <TableFooter>
           <Pagination
-            totalResults={filteredData.length}
             resultsPerPage={resultsPerPage}
-            label="Table navigation"
-            onChange={setPage}
+            totalResults={filteredData.length}
+            currentPage={page}
+            currentResults={tableData.length}
+            handlePageClick={setPage}
           />
         </TableFooter>
       </TableContainer>

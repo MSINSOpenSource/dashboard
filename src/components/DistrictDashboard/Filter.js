@@ -55,9 +55,10 @@ function Filter({
           <div className="relative h-10 dark:bg-gray-900 bg-white rounded-lg">
             <Button
               layout="link"
-              onClick={() => setFacilityTypeFilterOpen(!facilityTypeFilterOpen)}
+              onClick={() => setFacilityTypeFilterOpen(true)}
               iconRight={ChevronDown}
               className="w-full shadow-xs"
+              disabled={facilityTypeFilterOpen}
             >
               Facility Type
             </Button>
@@ -116,7 +117,7 @@ function Filter({
                 {facilityTypesFilterOptions.map((d, i) => (
                   <Label key={i} check>
                     <Input
-                      onClick={() => {
+                      onChange={() => {
                         const _t = _filterFacilityTypes.indexOf(d);
                         const _tmp = [..._filterFacilityTypes];
                         if (_t > -1) {

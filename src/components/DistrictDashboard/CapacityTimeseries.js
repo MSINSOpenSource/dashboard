@@ -115,20 +115,20 @@ function CapacityTimeseries({ filterDistrict, filterFacilityTypes, dates }) {
               name={s.name}
               data={s.data}
               dataKeys={["used", "total"]}
-              colors={["var(--color-green-400)", "var(--color-green-500)"]}
+              colors={["var(--color-primary-400)", "var(--color-primary-500)"]}
             />
           ))}
           <TimeseriesLineChart
             name={chartableOxygen.name}
             data={chartableOxygen.data}
             dataKeys={["oxygen"]}
-            colors={["var(--color-green-500)"]}
+            colors={["var(--color-primary-500)"]}
           />
           <TimeseriesLineChart
             name={chartablePatient.name}
             data={chartablePatient.data}
             dataKeys={["live", "discharged"]}
-            colors={["var(--color-green-500)", "var(--color-green-400)"]}
+            colors={["var(--color-primary-500)", "var(--color-primary-400)"]}
           />
         </>
       ) : (
