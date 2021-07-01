@@ -74,7 +74,7 @@ export function OxygenCard({ data }) {
   };
 
   const showOxygenInfo = (oxygenData, parameter) => (
-    <div className="grid row-span-2 grid-cols-9 items-center mt-4">
+    <div className="grid row-span-2 grid-cols-7 items-center mt-4">
       <div className="flex flex-row col-span-1 items-center">
         {getSVG(parameter)}
         <div className="dark:text-gray-200 text-sm font-medium">
@@ -85,12 +85,12 @@ export function OxygenCard({ data }) {
         !val ? (
           <div
             key={`${idx}_${data.facility_name}`}
-            className="col-span-2 text-center dark:text-gray-400 text-gray-600 text-lg font-semibold"
+            className="col-span-1 text-center dark:text-gray-400 text-gray-600 text-lg font-semibold"
           ></div>
         ) : (
           <div
             key={`${idx}_${data.facility_name}`}
-            className="col-span-2 text-center dark:text-gray-400 text-gray-600 text-lg font-semibold"
+            className="col-span-1 text-center dark:text-gray-400 text-gray-600 text-lg font-semibold"
           >
             <div className="flex flex-row justify-center">
               <div
@@ -151,26 +151,26 @@ export function OxygenCard({ data }) {
       </div>
 
       <div className="grid-rows-7 grid mt-2 pt-2 w-full border-t overflow-x-scroll overflow-y-hidden md:mt-4 md:pt-0 md:border-0 md:overflow-hidden">
-        <div className="grid row-span-1 grid-cols-9 w-800 md:w-full">
+        <div className="grid row-span-1 grid-cols-7 w-800 md:w-full">
           <div className="col-span-1" />
           {Object.values(OXYGEN_TYPES).map((val, idx) => (
             <div
               key={idx}
-              className="col-span-2 text-center dark:text-gray-400 text-gray-600 text-sm font-semibold"
+              className="col-span-1 text-center dark:text-gray-400 text-gray-600 text-sm font-semibold"
             >
               {val.toUpperCase()}
             </div>
           ))}
         </div>
 
-        <div className="md:w-ful grid row-span-1 grid-cols-9 md:mt-1 md:pb-1 md:pt-1 md:border-b md:border-t">
+        <div className="md:w-ful grid row-span-1 grid-cols-7 md:mt-1 md:pb-1 md:pt-1 md:border-b md:border-t">
           <div className="col-span-1 dark:text-gray-400 text-gray-600 text-xs font-semibold">
             LAST UPDATED
           </div>
           {data.last_updated.map((val, idx) => (
             <div
               key={idx}
-              className="col-span-2 text-center dark:text-gray-400 text-gray-600 text-xs font-semibold"
+              className="col-span-1 text-center dark:text-gray-400 text-gray-600 text-xs font-semibold"
             >
               {val}
             </div>
