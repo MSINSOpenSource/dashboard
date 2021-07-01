@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 
 import { SidebarContext } from "../context/SidebarContext";
 import msinsLogo from "../assets/mahakavach/msinsLogo-removebg.png";
+import msinsLogoWhite from "../assets/mahakavach/MSInS_logo_white.png";
 
 function Header() {
   const { mode, toggleMode } = useContext(WindmillContext);
@@ -39,7 +40,11 @@ function Header() {
         </div>
         <div className="item-center flex flex-shrink-0 justify-between space-x-6">
           <div className="flex items-center">
-            <img src={msinsLogo} className="m-auto max-h-6" alt="MSINS"></img>
+            <img
+              src={mode === "dark" ? msinsLogoWhite : msinsLogo}
+              className="m-auto max-h-8"
+              alt="MSINS"
+            ></img>
           </div>
           <button
             type="button"

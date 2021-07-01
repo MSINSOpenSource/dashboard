@@ -1,11 +1,14 @@
-import React from "react";
+import { WindmillContext } from "@windmill/react-ui";
+import React, { useContext } from "react";
 import { NavLink, Route } from "react-router-dom";
 
 import msinsLogo from "../../assets/mahakavach/msinsLogo-removebg.png";
+import msinsLogoWhite from "../../assets/mahakavach/MSInS_logo_white.png";
 import routes from "../../routes/sidebar";
 import SidebarSubmenu from "./SidebarSubmenu";
 
 function SidebarContent() {
+  const { mode } = useContext(WindmillContext);
   return (
     <div className="flex flex-col justify-between py-4 min-h-full dark:text-gray-400 text-gray-500">
       <ul className="mt-2">
@@ -53,7 +56,11 @@ function SidebarContent() {
             className="inline-flex text-xs space-x-1"
           >
             <span>Copyright © 2021</span>
-            <img src={msinsLogo} className="m-auto max-h-6" alt="MSINS"></img>
+            <img
+              src={mode === "dark" ? msinsLogoWhite : msinsLogo}
+              className="m-auto max-h-8"
+              alt="MSINS"
+            ></img>
           </a>
           <a
             href="https://github.com/coronasafe/dashboard/blob/master/LICENSE"
