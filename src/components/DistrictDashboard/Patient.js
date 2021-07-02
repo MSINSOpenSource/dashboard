@@ -49,7 +49,6 @@ function Patient({ filterDistrict, filterFacilityTypes, date }) {
   );
 
   const { facilitiesTrivia, exported, tableData } = useMemo(() => {
-    console.log(data.results);
     const filtered = processFacilities(data.results, filterFacilityTypes);
     const facilitiesTrivia = filtered.reduce(
       (a, c) => {
@@ -66,6 +65,7 @@ function Patient({ filterDistrict, filterFacilityTypes, date }) {
         previous: JSON.parse(JSON.stringify(initialFacilitiesTrivia)),
       }
     );
+
     const tableData = filtered.reduce((a, c) => {
       if (c.date !== dateString(date)) {
         return a;
@@ -73,7 +73,7 @@ function Patient({ filterDistrict, filterFacilityTypes, date }) {
       return [
         ...a,
         [
-          [c.name, c.facilityType, c.phoneNumber],
+          [c.name, c.facilityType, c.phoneNumber, c.id],
           dayjs(c.modifiedDate, "DD-MM-YYYY HH:mm").fromNow(),
           ...Object.keys(PATIENT_TYPES).map((k) => {
             const delta = c[`today_patients_${k}`] || 0;
